@@ -10,13 +10,20 @@ import UIKit
 import AVFoundation
 import SnapKit
 
-class ViewController: UIViewController, AVAudioRecorderDelegate {
+class ViewController: UIViewController, AVAudioRecorderDelegate, UIGestureRecognizerDelegate, RecordingsViewDelegate {
     
+    var coreButtons: UIStackView!
     var rewindButton: UIButton!
     var playButton: UIButton!
     var recordButton: UIButton!
+    var recordingsView = RecordingsView()
+    var audioPlayer = AVAudioPlayer()
+    
     var recordingSession: AVAudioSession!
     var audioRecorder: AVAudioRecorder!
+    var draggableSnippet: UIView!
+    
+    var recordingsManager = RecordingsManager()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,13 +37,11 @@ class ViewController: UIViewController, AVAudioRecorderDelegate {
         rewindButton.backgroundColor = Colors.RED
         rewindButton.layer.cornerRadius = Sizing.Buttons.SMALL / 2
         rewindButton.setImage(UIImage(named: "Rewind"), for: .normal)
-        view.addSubview(rewindButton)
         
         playButton = UIButton()
         playButton.backgroundColor = Colors.RED
         playButton.layer.cornerRadius = Sizing.Buttons.LARGE / 2
         playButton.setImage(UIImage(named: "Play"), for: .normal)
-        view.addSubview(playButton)
         
         recordButton = UIButton()
         recordButton.addTarget(self, action: #selector(recordTapped), for: .touchUpInside)
@@ -44,30 +49,75 @@ class ViewController: UIViewController, AVAudioRecorderDelegate {
         recordButton.layer.cornerRadius = Sizing.Buttons.SMALL / 2
         recordButton.setImage(UIImage(named: "Record"), for: .normal)
         recordButton.layer.borderColor = UIColor.white.cgColor
-        view.addSubview(recordButton)
         
-        getDocuments()
+        coreButtons = UIStackView()
+        coreButtons.axis = .horizontal
+        coreButtons.alignment = .center
+        coreButtons.distribution = .equalSpacing
+        coreButtons.addArrangedSubview(rewindButton)
+        coreButtons.addArrangedSubview(playButton)
+        coreButtons.addArrangedSubview(recordButton)
+        coreButtons.backgroundColor = .black
+        view.addSubview(coreButtons)
         
+        recordingsView.recordings = recordingsManager.getRecordings()
+        recordingsView.delegate = self
+        view.addSubview(recordingsView)
+        
+        draggableSnippet = UIView()
+        draggableSnippet.backgroundColor = .green
+        view.addSubview(draggableSnippet)
+        
+        let gesture = UIPanGestureRecognizer(target: self, action: #selector(wasDragged))
+        draggableSnippet.addGestureRecognizer(gesture)
+        draggableSnippet.isUserInteractionEnabled = true
+        gesture.delegate = self
+                
         setupConstraints()
     }
     
     func setupConstraints() {
-        recordButton.snp.makeConstraints({ make -> Void in
+        coreButtons.snp.makeConstraints({ make -> Void in
+            make.leading.equalTo(view).offset(150)
+            make.trailing.equalTo(view).offset(-30)
             make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
-            make.trailing.equalTo(view).inset(20)
+            make.height.equalTo(Sizing.Buttons.LARGE)
+        })
+        recordButton.snp.makeConstraints({ make -> Void in
             make.width.height.equalTo(Sizing.Buttons.SMALL)
         })
         playButton.snp.makeConstraints({ make -> Void in
-            make.bottom.equalTo(recordButton)
-            make.trailing.equalTo(recordButton.snp.leading).offset(-20)
             make.width.height.equalTo(Sizing.Buttons.LARGE)
         })
         rewindButton.snp.makeConstraints({ make -> Void in
-            make.bottom.equalTo(recordButton)
-            make.trailing.equalTo(playButton.snp.leading).offset(-20)
             make.width.height.equalTo(Sizing.Buttons.SMALL)
         })
-        
+        recordingsView.snp.makeConstraints({ make -> Void in
+            make.leading.equalTo(view)
+            make.trailing.equalTo(coreButtons.snp.leading).offset(-30)
+            make.bottom.equalTo(view)
+            make.top.equalTo(view)  // to change
+        })
+        draggableSnippet.snp.makeConstraints({ make -> Void in
+            make.center.equalTo(view)
+            make.height.width.equalTo(100)
+        })
+    }
+    
+    @objc func wasDragged(gestureRecognizer: UIPanGestureRecognizer) {
+        if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
+            let translation = gestureRecognizer.translation(in: self.view)
+            print(gestureRecognizer.view!.center.y)
+            if gestureRecognizer.view!.frame.minY < 0 && translation.y < 0 {
+                gestureRecognizer.view!.center = CGPoint(x: gestureRecognizer.view!.center.x, y: gestureRecognizer.view!.center.y)
+            } else if gestureRecognizer.view!.frame.maxY > view.frame.maxY && translation.y > 0 {
+                
+            } else {
+                gestureRecognizer.view!.center = CGPoint(x: gestureRecognizer.view!.center.x, y: gestureRecognizer.view!.center.y + translation.y)
+            }
+
+            gestureRecognizer.setTranslation(CGPoint(x: 0, y: 0), in: self.view)
+        }
     }
     
     @objc func askForPermissions() {
@@ -88,16 +138,25 @@ class ViewController: UIViewController, AVAudioRecorderDelegate {
         }
     }
     
+    func playRecording(url: URL) {
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer.play()
+        } catch {
+            print(error)
+        }
+    }
+    
     func startRecording() {
         var fileName = "Snippet"
         var count = 1
-        let filesInDocuments = getDocuments()
+        let filesInDocuments = recordingsManager.getRecordingNames()
         while filesInDocuments.contains(fileName) {
-            fileName = "\(fileName)_\(count)"
+            fileName = "Snippet_\(count)"
             count += 1
         }
         
-        let audioFilename = getDocumentsDirectory().appendingPathComponent("\(fileName).m4a")
+        let audioFilename = recordingsManager.getDocumentsDirectory().appendingPathComponent("\(fileName).m4a")
 
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
@@ -117,28 +176,6 @@ class ViewController: UIViewController, AVAudioRecorderDelegate {
         }
     }
     
-    func getDocumentsDirectory() -> URL {
-        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-    }
-    
-    func getDocuments() -> [String] {
-        let documentsUrl =  getDocumentsDirectory()
-
-        do {
-            let directoryContents = try FileManager.default.contentsOfDirectory(at: documentsUrl, includingPropertiesForKeys: nil)
-            print(directoryContents)
-
-            let m4aFiles = directoryContents.filter{ $0.pathExtension == "m4a" }
-            let m4aFileNames = m4aFiles.map{ $0.deletingPathExtension().lastPathComponent }
-            print("m4a list:", m4aFileNames)
-            return m4aFileNames
-
-        } catch {
-            print(error)
-        }
-        return []
-    }
-    
     func finishRecording(success: Bool) {
         audioRecorder.stop()
         audioRecorder = nil
@@ -146,11 +183,9 @@ class ViewController: UIViewController, AVAudioRecorderDelegate {
 
 
         if success {
-//            recordButton.setTitle("Tap to Re-record", for: .normal)
             print("Successfully recorded")
+            recordingsView.collectionView.reloadData()
         } else {
-//            recordButton.setTitle("Tap to Record", for: .normal)
-            // recording failed :(
             print("Failed recording")
         }
     }
@@ -170,3 +205,6 @@ class ViewController: UIViewController, AVAudioRecorderDelegate {
     }
 }
 
+protocol RecordingsViewDelegate: class {
+    func playRecording(url: URL)
+}

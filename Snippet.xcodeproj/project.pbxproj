@@ -14,6 +14,10 @@
 		4543B4AD24C4E5B300081BB5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4543B4AB24C4E5B300081BB5 /* LaunchScreen.storyboard */; };
 		4543B4B524C4EDA600081BB5 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4543B4B424C4EDA600081BB5 /* Colors.swift */; };
 		4543B4B724C4F4F100081BB5 /* Sizing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4543B4B624C4F4F100081BB5 /* Sizing.swift */; };
+		4543B4BD24C81C3F00081BB5 /* RecordingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4543B4BC24C81C3F00081BB5 /* RecordingsView.swift */; };
+		4543B4BF24C9052A00081BB5 /* Snippet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4543B4BE24C9052A00081BB5 /* Snippet.swift */; };
+		4543B4C124C905E800081BB5 /* RecordingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4543B4C024C905E800081BB5 /* RecordingsManager.swift */; };
+		4543B4C324C90D9E00081BB5 /* RecordingsViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4543B4C224C90D9E00081BB5 /* RecordingsViewCell.swift */; };
 		F177B882107850D40FC41DDD /* Pods_Snippet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1085902E2C6288547A221C9F /* Pods_Snippet.framework */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +32,10 @@
 		4543B4AE24C4E5B300081BB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4543B4B424C4EDA600081BB5 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		4543B4B624C4F4F100081BB5 /* Sizing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sizing.swift; sourceTree = "<group>"; };
+		4543B4BC24C81C3F00081BB5 /* RecordingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingsView.swift; sourceTree = "<group>"; };
+		4543B4BE24C9052A00081BB5 /* Snippet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snippet.swift; sourceTree = "<group>"; };
+		4543B4C024C905E800081BB5 /* RecordingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingsManager.swift; sourceTree = "<group>"; };
+		4543B4C224C90D9E00081BB5 /* RecordingsViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingsViewCell.swift; sourceTree = "<group>"; };
 		5A864324DCF50BE9D8E3ACA5 /* Pods-Snippet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Snippet.debug.xcconfig"; path = "Target Support Files/Pods-Snippet/Pods-Snippet.debug.xcconfig"; sourceTree = "<group>"; };
 		B21A96314A208D881C74610F /* Pods-Snippet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Snippet.release.xcconfig"; path = "Target Support Files/Pods-Snippet/Pods-Snippet.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -66,6 +74,9 @@
 			isa = PBXGroup;
 			children = (
 				4543B4A024C4E5AF00081BB5 /* AppDelegate.swift */,
+				45C331AB24CE149F00888853 /* RecordingsView */,
+				4543B4C024C905E800081BB5 /* RecordingsManager.swift */,
+				4543B4BE24C9052A00081BB5 /* Snippet.swift */,
 				4543B4A224C4E5AF00081BB5 /* SceneDelegate.swift */,
 				4543B4A424C4E5AF00081BB5 /* ViewController.swift */,
 				4543B4B924C4F74700081BB5 /* UI */,
@@ -83,6 +94,15 @@
 				4543B4B424C4EDA600081BB5 /* Colors.swift */,
 			);
 			name = UI;
+			sourceTree = "<group>";
+		};
+		45C331AB24CE149F00888853 /* RecordingsView */ = {
+			isa = PBXGroup;
+			children = (
+				4543B4BC24C81C3F00081BB5 /* RecordingsView.swift */,
+				4543B4C224C90D9E00081BB5 /* RecordingsViewCell.swift */,
+			);
+			name = RecordingsView;
 			sourceTree = "<group>";
 		};
 		786A6FEA9BD41D3CFEC0A1FE /* Frameworks */ = {
@@ -217,10 +237,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4543B4A524C4E5AF00081BB5 /* ViewController.swift in Sources */,
+				4543B4C124C905E800081BB5 /* RecordingsManager.swift in Sources */,
+				4543B4BF24C9052A00081BB5 /* Snippet.swift in Sources */,
 				4543B4B724C4F4F100081BB5 /* Sizing.swift in Sources */,
+				4543B4BD24C81C3F00081BB5 /* RecordingsView.swift in Sources */,
 				4543B4B524C4EDA600081BB5 /* Colors.swift in Sources */,
 				4543B4A124C4E5AF00081BB5 /* AppDelegate.swift in Sources */,
 				4543B4A324C4E5AF00081BB5 /* SceneDelegate.swift in Sources */,
+				4543B4C324C90D9E00081BB5 /* RecordingsViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
