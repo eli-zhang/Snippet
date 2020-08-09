@@ -11,7 +11,10 @@ import UIKit
 
 struct Sizing {
     struct Buttons {
-        static let LARGE: CGFloat = 80
-        static let SMALL: CGFloat = 60
+        static let LARGE: CGFloat = 75
+        static let SMALL: CGFloat = 55
+    }
+    struct Tracks {
+        static let SNIPPET_TO_TRACK_SPACING: CGFloat = 8
     }
 }

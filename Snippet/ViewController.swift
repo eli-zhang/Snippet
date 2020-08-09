@@ -9,16 +9,19 @@
 import UIKit
 import AVFoundation
 import SnapKit
+import Foundation
 
-class ViewController: UIViewController, AVAudioRecorderDelegate, UIGestureRecognizerDelegate, RecordingsViewDelegate {
+class ViewController: UIViewController, AVAudioRecorderDelegate, RecordingsViewDelegate {
     
     var coreButtons: UIStackView!
+    var zoomSlider: UISlider!
     var rewindButton: UIButton!
     var playButton: UIButton!
     var recordButton: UIButton!
     var recordingsView = RecordingsView()
-    var audioPlayer = AVAudioPlayer()
+    var trackView = TrackView()
     
+    var audioPlayer: AVAudioPlayer!
     var recordingSession: AVAudioSession!
     var audioRecorder: AVAudioRecorder!
     var draggableSnippet: UIView!
@@ -32,6 +35,12 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, UIGestureRecogn
         
         recordingSession = AVAudioSession.sharedInstance()
         askForPermissions()
+        
+        zoomSlider = UISlider()
+        zoomSlider.minimumTrackTintColor = Colors.RED
+        zoomSlider.thumbTintColor = Colors.RED
+        zoomSlider.addTarget(self, action: #selector(changeZoom), for: .valueChanged)
+        view.addSubview(zoomSlider)
         
         rewindButton = UIButton()
         rewindButton.backgroundColor = Colors.RED
@@ -60,26 +69,25 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, UIGestureRecogn
         coreButtons.backgroundColor = .black
         view.addSubview(coreButtons)
         
+        print(recordingsManager.getRecordings())
         recordingsView.recordings = recordingsManager.getRecordings()
         recordingsView.delegate = self
         view.addSubview(recordingsView)
         
-        draggableSnippet = UIView()
-        draggableSnippet.backgroundColor = .green
-        view.addSubview(draggableSnippet)
-        
-        let gesture = UIPanGestureRecognizer(target: self, action: #selector(wasDragged))
-        draggableSnippet.addGestureRecognizer(gesture)
-        draggableSnippet.isUserInteractionEnabled = true
-        gesture.delegate = self
+        trackView = TrackView()
+        view.addSubview(trackView)
                 
         setupConstraints()
     }
     
     func setupConstraints() {
+        zoomSlider.snp.makeConstraints({ make -> Void in
+            make.leading.trailing.equalTo(coreButtons)
+            make.bottom.equalTo(coreButtons.snp.top).offset(-20)
+        })
         coreButtons.snp.makeConstraints({ make -> Void in
             make.leading.equalTo(view).offset(150)
-            make.trailing.equalTo(view).offset(-30)
+            make.trailing.equalTo(view).offset(-20)
             make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
             make.height.equalTo(Sizing.Buttons.LARGE)
         })
@@ -93,31 +101,17 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, UIGestureRecogn
             make.width.height.equalTo(Sizing.Buttons.SMALL)
         })
         recordingsView.snp.makeConstraints({ make -> Void in
-            make.leading.equalTo(view)
+            make.leading.equalTo(view).offset(20)
             make.trailing.equalTo(coreButtons.snp.leading).offset(-30)
             make.bottom.equalTo(view)
-            make.top.equalTo(view)  // to change
+            make.top.equalTo(view).offset(40)
         })
-        draggableSnippet.snp.makeConstraints({ make -> Void in
-            make.center.equalTo(view)
-            make.height.width.equalTo(100)
+        trackView.snp.makeConstraints({ make -> Void in
+            make.leading.equalTo(recordingsView.snp.trailing).offset(20)
+            make.trailing.equalTo(view)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+            make.bottom.equalTo(zoomSlider.snp.top).offset(-20)
         })
-    }
-    
-    @objc func wasDragged(gestureRecognizer: UIPanGestureRecognizer) {
-        if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
-            let translation = gestureRecognizer.translation(in: self.view)
-            print(gestureRecognizer.view!.center.y)
-            if gestureRecognizer.view!.frame.minY < 0 && translation.y < 0 {
-                gestureRecognizer.view!.center = CGPoint(x: gestureRecognizer.view!.center.x, y: gestureRecognizer.view!.center.y)
-            } else if gestureRecognizer.view!.frame.maxY > view.frame.maxY && translation.y > 0 {
-                
-            } else {
-                gestureRecognizer.view!.center = CGPoint(x: gestureRecognizer.view!.center.x, y: gestureRecognizer.view!.center.y + translation.y)
-            }
-
-            gestureRecognizer.setTranslation(CGPoint(x: 0, y: 0), in: self.view)
-        }
     }
     
     @objc func askForPermissions() {
@@ -138,6 +132,10 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, UIGestureRecogn
         }
     }
     
+    @objc func changeZoom() {
+        trackView.changeZoom(value: Double(zoomSlider.value) * 0.03 + 0.003)
+    }
+    
     func playRecording(url: URL) {
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: url)
@@ -145,6 +143,10 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, UIGestureRecogn
         } catch {
             print(error)
         }
+    }
+    
+    func addRecordingToTrack(snippet: Snippet) {
+        trackView.addRecordingToTrack(snippet: snippet)
     }
     
     func startRecording() {
@@ -181,9 +183,9 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, UIGestureRecogn
         audioRecorder = nil
         UIView.animate(withDuration: 0.5, animations: { self.recordButton.layer.borderWidth = 0 })
 
-
         if success {
             print("Successfully recorded")
+            recordingsView.recordings = recordingsManager.getRecordings()
             recordingsView.collectionView.reloadData()
         } else {
             print("Failed recording")
@@ -207,4 +209,5 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, UIGestureRecogn
 
 protocol RecordingsViewDelegate: class {
     func playRecording(url: URL)
+    func addRecordingToTrack(snippet: Snippet)
 }

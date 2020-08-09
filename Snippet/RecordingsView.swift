@@ -9,21 +9,7 @@
 import UIKit
 import SnapKit
 
-class RecordingsView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    
-    // MARK: These should be draggable into the timelineView, look into drag and drop
-    
-//    lazy var collectionView : UICollectionView = {
-//        let layout = UICollectionViewFlowLayout()
-//        let cv = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
-//        //If you set it false, you have to add constraints.
-//        cv.translatesAutoresizingMaskIntoConstraints = false
-//        cv.delegate = self
-//        cv.dataSource = self
-//        cv.register(HeaderCell.self, forCellWithReuseIdentifier: "HeaderCell")
-//        cv.backgroundColor = .yellow
-//        return cv
-//    }()
+class RecordingsView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate {
     
     var collectionView: UICollectionView!
     var reuseIdentifier = "recordingsViewReuseIdentifier"
@@ -32,16 +18,22 @@ class RecordingsView: UIView, UICollectionViewDataSource, UICollectionViewDelega
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        self.backgroundColor = .red
         
         let layout = UICollectionViewFlowLayout()
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.backgroundColor = .clear
+        collectionView.alwaysBounceVertical = true
         collectionView.register(RecordingsViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         addSubview(collectionView)
+        
+        let lpgr = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+        lpgr.minimumPressDuration = 0.5
+        lpgr.delaysTouchesBegan = true
+        lpgr.delegate = self
+        self.collectionView.addGestureRecognizer(lpgr)
         
         setupConstraints()
     }
@@ -49,6 +41,23 @@ class RecordingsView: UIView, UICollectionViewDataSource, UICollectionViewDelega
     func setupConstraints() {
         collectionView.snp.makeConstraints { make -> Void in
             make.edges.equalTo(self)
+        }
+    }
+    
+    @objc func handleLongPress(gestureReconizer: UILongPressGestureRecognizer) {
+        // On long press, we play the audio file
+        if gestureReconizer.state != .ended {
+            return
+        }
+
+        let p = gestureReconizer.location(in: self.collectionView)
+        let indexPath = self.collectionView.indexPathForItem(at: p)
+
+        if let index = indexPath {
+            let audioUrl = recordings[index.item].path
+            delegate?.playRecording(url: audioUrl)
+        } else {
+            print("Could not find index path")
         }
     }
 
@@ -66,16 +75,16 @@ class RecordingsView: UIView, UICollectionViewDataSource, UICollectionViewDelega
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! RecordingsViewCell
-        cell.layer.cornerRadius = 15
         cell.configure(title: recordings[indexPath.item].snippetName)
-        cell.backgroundColor = .cyan
         cell.setNeedsUpdateConstraints()
+        cell.layer.cornerRadius = 10
+        cell.backgroundColor = Colors.ORANGE
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let audioUrl = recordings[indexPath.item].path
-        delegate?.playRecording(url: audioUrl)
+        // On tap, we add the audio file to the track view
+        delegate?.addRecordingToTrack(snippet: recordings[indexPath.item])
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

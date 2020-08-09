@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 class RecordingsManager {
     func getDocumentsDirectory() -> URL {
@@ -34,7 +35,14 @@ class RecordingsManager {
     
     func getRecordings() -> [Snippet] {
         return getRecordingDirectories().map {
-            Snippet(startTime: 0, endTime: 0, snippetName: $0.deletingPathExtension().lastPathComponent, path: $0, clipId: "0")
+            let duration = AVAsset(url: $0).duration.seconds * 1000
+            return Snippet(
+                startTime: 0,
+                endTime: duration,
+                duration: duration,
+                snippetName: $0.deletingPathExtension().lastPathComponent,
+                path: $0,
+                clipId: "0")
         }
     }
 }

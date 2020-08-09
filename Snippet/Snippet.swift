@@ -9,9 +9,11 @@
 import Foundation
 
 struct Snippet {
-    var startTime: Int  // Start time in milliseconds from clip
-    var endTime: Int    // End time in milliseconds from clip
+    var startTime: Double  // Start time in milliseconds from clip
+    var endTime: Double    // End time in milliseconds from clip
+    var duration: Double
     var snippetName: String
     var path: URL
     var clipId: String
+    var track: Int = 0
 }

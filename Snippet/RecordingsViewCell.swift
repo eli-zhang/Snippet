@@ -14,7 +14,10 @@ class RecordingsViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
+        
         snippetTitle = UILabel()
+        snippetTitle.textAlignment = .center
+        snippetTitle.textColor = .white
         contentView.addSubview(snippetTitle)
     }
     
@@ -24,7 +27,8 @@ class RecordingsViewCell: UICollectionViewCell {
     
     override func updateConstraints() {
         snippetTitle.snp.makeConstraints({ make -> Void in
-            make.leading.trailing.equalTo(self.contentView)
+            make.leading.trailing.equalTo(self.contentView).inset(5)
+            make.center.equalTo(self.contentView)
         })
         super.updateConstraints()
     }
