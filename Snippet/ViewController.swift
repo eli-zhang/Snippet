@@ -11,7 +11,7 @@ import AVFoundation
 import SnapKit
 import Foundation
 
-class ViewController: UIViewController, AVAudioRecorderDelegate, RecordingsViewDelegate {
+class ViewController: UIViewController, AVAudioRecorderDelegate, AudioPlayerDelegate {
     
     var coreButtons: UIStackView!
     var zoomSlider: UISlider!
@@ -35,6 +35,7 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, RecordingsViewD
         
         recordingSession = AVAudioSession.sharedInstance()
         askForPermissions()
+        setVolume()
         
         zoomSlider = UISlider()
         zoomSlider.minimumTrackTintColor = Colors.RED
@@ -48,6 +49,7 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, RecordingsViewD
         rewindButton.setImage(UIImage(named: "Rewind"), for: .normal)
         
         playButton = UIButton()
+        playButton.addTarget(self, action: #selector(beginPlayback), for: .touchUpInside)
         playButton.backgroundColor = Colors.RED
         playButton.layer.cornerRadius = Sizing.Buttons.LARGE / 2
         playButton.setImage(UIImage(named: "Play"), for: .normal)
@@ -69,12 +71,12 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, RecordingsViewD
         coreButtons.backgroundColor = .black
         view.addSubview(coreButtons)
         
-        print(recordingsManager.getRecordings())
         recordingsView.recordings = recordingsManager.getRecordings()
         recordingsView.delegate = self
         view.addSubview(recordingsView)
         
         trackView = TrackView()
+        trackView.delegate = self
         view.addSubview(trackView)
                 
         setupConstraints()
@@ -132,12 +134,21 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, RecordingsViewD
         }
     }
     
+    func setVolume() {
+        do {
+            try AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
+        } catch {
+            print("Couldn't set audio to play from main speaker.")
+        }
+    }
+    
     @objc func changeZoom() {
         trackView.changeZoom(value: Double(zoomSlider.value) * 0.03 + 0.003)
     }
     
     func playRecording(url: URL) {
         do {
+            print(url)
             audioPlayer = try AVAudioPlayer(contentsOf: url)
             audioPlayer.play()
         } catch {
@@ -145,8 +156,8 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, RecordingsViewD
         }
     }
     
-    func addRecordingToTrack(snippet: Snippet) {
-        trackView.addRecordingToTrack(snippet: snippet)
+    func addRecordingToTrack(recording: Recording) {
+        trackView.addRecordingToTrack(recording: recording)
     }
     
     func startRecording() {
@@ -192,6 +203,10 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, RecordingsViewD
         }
     }
     
+    @objc func beginPlayback() {
+        self.trackView.beginPlayback()
+    }
+    
     @objc func recordTapped() {
         if audioRecorder == nil {
             startRecording()
@@ -207,7 +222,7 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, RecordingsViewD
     }
 }
 
-protocol RecordingsViewDelegate: class {
+protocol AudioPlayerDelegate: class {
     func playRecording(url: URL)
-    func addRecordingToTrack(snippet: Snippet)
+    func addRecordingToTrack(recording: Recording)
 }

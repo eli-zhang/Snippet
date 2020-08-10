@@ -7,3 +7,10 @@
 //
 
 import Foundation
+
+struct Recording {
+    var id: Int
+    var duration: Double
+    var recordingName: String
+    var path: URL
+}

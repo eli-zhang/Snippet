@@ -33,16 +33,28 @@ class RecordingsManager {
         return []
     }
     
-    func getRecordings() -> [Snippet] {
+//    func getRecordings() -> [Snippet] {
+//        return getRecordingDirectories().map {
+//            let duration = AVAsset(url: $0).duration.seconds * 1000
+//            return Snippet(
+//                startTime: 0,
+//                endTime: duration,
+//                duration: duration,
+//                snippetName: $0.deletingPathExtension().lastPathComponent,
+//                path: $0,
+//                clipId: "0")
+//        }
+//    }
+    
+    func getRecordings() -> [Recording] {
         return getRecordingDirectories().map {
             let duration = AVAsset(url: $0).duration.seconds * 1000
-            return Snippet(
-                startTime: 0,
-                endTime: duration,
+            return Recording(
+                id: GenerateId.generateRecordingId(),
                 duration: duration,
-                snippetName: $0.deletingPathExtension().lastPathComponent,
-                path: $0,
-                clipId: "0")
+                recordingName: $0.deletingPathExtension().lastPathComponent,
+                path: $0
+            )
         }
     }
 }

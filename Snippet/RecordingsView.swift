@@ -13,8 +13,8 @@ class RecordingsView: UIView, UICollectionViewDataSource, UICollectionViewDelega
     
     var collectionView: UICollectionView!
     var reuseIdentifier = "recordingsViewReuseIdentifier"
-    var recordings: [Snippet] = []
-    weak var delegate: RecordingsViewDelegate?
+    var recordings: [Recording] = []
+    weak var delegate: AudioPlayerDelegate?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -75,7 +75,7 @@ class RecordingsView: UIView, UICollectionViewDataSource, UICollectionViewDelega
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! RecordingsViewCell
-        cell.configure(title: recordings[indexPath.item].snippetName)
+        cell.configure(title: recordings[indexPath.item].recordingName)
         cell.setNeedsUpdateConstraints()
         cell.layer.cornerRadius = 10
         cell.backgroundColor = Colors.ORANGE
@@ -84,7 +84,7 @@ class RecordingsView: UIView, UICollectionViewDataSource, UICollectionViewDelega
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // On tap, we add the audio file to the track view
-        delegate?.addRecordingToTrack(snippet: recordings[indexPath.item])
+        delegate?.addRecordingToTrack(recording: recordings[indexPath.item])
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

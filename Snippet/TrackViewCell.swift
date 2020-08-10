@@ -11,6 +11,7 @@ import SnapKit
 
 class TrackViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     var draggableSnippets: [UIView] = []
+    var zoomMultiplier: Double!
     weak var delegate: TrackViewCellDelegate?
     
     override func prepareForReuse() {
@@ -35,6 +36,8 @@ class TrackViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     
     func createDraggableSnippet(snippet: Snippet, zoomMultiplier: Double) {
         let draggableSnippet = UIView()
+        self.zoomMultiplier = zoomMultiplier
+        draggableSnippet.tag = snippet.id   // This may be dangerous with cell reuse
         draggableSnippet.backgroundColor = Colors.LIGHTGRAY
         draggableSnippet.layer.cornerRadius = 5
         draggableSnippets.append(draggableSnippet)
@@ -68,6 +71,9 @@ class TrackViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
             } else {
                 gestureRecognizer.view!.center = CGPoint(x: gestureRecognizer.view!.center.x, y: gestureRecognizer.view!.center.y + translation.y)
             }
+            delegate?.translate(snippetId: gestureRecognizer.view!.tag,
+                                newStartTime: Double(gestureRecognizer.view!.frame.minY) / zoomMultiplier,
+                                newEndTime: Double(gestureRecognizer.view!.frame.maxY) / zoomMultiplier)
             gestureRecognizer.setTranslation(CGPoint(x: 0, y: 0), in: self.contentView)
         }
     }
