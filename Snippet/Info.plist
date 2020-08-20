@@ -58,5 +58,10 @@
 	</array>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app would like to access your microphone to make recordings.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

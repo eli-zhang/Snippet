@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		450B184724EE3C3700828570 /* AddTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450B184624EE3C3700828570 /* AddTrackCell.swift */; };
 		4543B4A124C4E5AF00081BB5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4543B4A024C4E5AF00081BB5 /* AppDelegate.swift */; };
 		4543B4A324C4E5AF00081BB5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4543B4A224C4E5AF00081BB5 /* SceneDelegate.swift */; };
 		4543B4A524C4E5AF00081BB5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4543B4A424C4E5AF00081BB5 /* ViewController.swift */; };
@@ -20,6 +21,10 @@
 		4543B4C324C90D9E00081BB5 /* RecordingsViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4543B4C224C90D9E00081BB5 /* RecordingsViewCell.swift */; };
 		4553FA3424E0A443004A53FB /* Recording.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4553FA3324E0A443004A53FB /* Recording.swift */; };
 		4553FA3924E0A4E2004A53FB /* GenerateID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4553FA3824E0A4E2004A53FB /* GenerateID.swift */; };
+		4553FA3D24E2256B004A53FB /* Sockets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4553FA3C24E2256B004A53FB /* Sockets.swift */; };
+		4553FA3F24EC56EB004A53FB /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4553FA3E24EC56EB004A53FB /* UserInfo.swift */; };
+		4553FA4124EC5BE6004A53FB /* Requests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4553FA4024EC5BE6004A53FB /* Requests.swift */; };
+		4553FA4324EC5C80004A53FB /* SignInTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4553FA4224EC5C80004A53FB /* SignInTokens.swift */; };
 		45C331AD24CE20DB00888853 /* TrackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C331AC24CE20DB00888853 /* TrackView.swift */; };
 		45C331AF24CE219D00888853 /* TrackViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45C331AE24CE219D00888853 /* TrackViewCell.swift */; };
 		F177B882107850D40FC41DDD /* Pods_Snippet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1085902E2C6288547A221C9F /* Pods_Snippet.framework */; };
@@ -27,6 +32,7 @@
 
 /* Begin PBXFileReference section */
 		1085902E2C6288547A221C9F /* Pods_Snippet.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Snippet.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		450B184624EE3C3700828570 /* AddTrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTrackCell.swift; sourceTree = "<group>"; };
 		4543B49D24C4E5AF00081BB5 /* Snippet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Snippet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4543B4A024C4E5AF00081BB5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4543B4A224C4E5AF00081BB5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -42,6 +48,10 @@
 		4543B4C224C90D9E00081BB5 /* RecordingsViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingsViewCell.swift; sourceTree = "<group>"; };
 		4553FA3324E0A443004A53FB /* Recording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recording.swift; sourceTree = "<group>"; };
 		4553FA3824E0A4E2004A53FB /* GenerateID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateID.swift; sourceTree = "<group>"; };
+		4553FA3C24E2256B004A53FB /* Sockets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sockets.swift; sourceTree = "<group>"; };
+		4553FA3E24EC56EB004A53FB /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
+		4553FA4024EC5BE6004A53FB /* Requests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Requests.swift; sourceTree = "<group>"; };
+		4553FA4224EC5C80004A53FB /* SignInTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInTokens.swift; sourceTree = "<group>"; };
 		45C331AC24CE20DB00888853 /* TrackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackView.swift; sourceTree = "<group>"; };
 		45C331AE24CE219D00888853 /* TrackViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackViewCell.swift; sourceTree = "<group>"; };
 		5A864324DCF50BE9D8E3ACA5 /* Pods-Snippet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Snippet.debug.xcconfig"; path = "Target Support Files/Pods-Snippet/Pods-Snippet.debug.xcconfig"; sourceTree = "<group>"; };
@@ -93,6 +103,10 @@
 				4543B4A924C4E5B300081BB5 /* Assets.xcassets */,
 				4543B4AB24C4E5B300081BB5 /* LaunchScreen.storyboard */,
 				4543B4AE24C4E5B300081BB5 /* Info.plist */,
+				4553FA3C24E2256B004A53FB /* Sockets.swift */,
+				4553FA4024EC5BE6004A53FB /* Requests.swift */,
+				4553FA4224EC5C80004A53FB /* SignInTokens.swift */,
+				4553FA3E24EC56EB004A53FB /* UserInfo.swift */,
 			);
 			path = Snippet;
 			sourceTree = "<group>";
@@ -128,6 +142,7 @@
 			children = (
 				45C331AC24CE20DB00888853 /* TrackView.swift */,
 				45C331AE24CE219D00888853 /* TrackViewCell.swift */,
+				450B184624EE3C3700828570 /* AddTrackCell.swift */,
 			);
 			name = TrackView;
 			sourceTree = "<group>";
@@ -273,17 +288,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				4543B4A524C4E5AF00081BB5 /* ViewController.swift in Sources */,
+				450B184724EE3C3700828570 /* AddTrackCell.swift in Sources */,
 				4543B4C124C905E800081BB5 /* RecordingsManager.swift in Sources */,
 				45C331AD24CE20DB00888853 /* TrackView.swift in Sources */,
+				4553FA4324EC5C80004A53FB /* SignInTokens.swift in Sources */,
 				4553FA3924E0A4E2004A53FB /* GenerateID.swift in Sources */,
 				4543B4BF24C9052A00081BB5 /* Snippet.swift in Sources */,
+				4553FA4124EC5BE6004A53FB /* Requests.swift in Sources */,
 				4543B4B724C4F4F100081BB5 /* Sizing.swift in Sources */,
+				4553FA3D24E2256B004A53FB /* Sockets.swift in Sources */,
 				45C331AF24CE219D00888853 /* TrackViewCell.swift in Sources */,
 				4543B4BD24C81C3F00081BB5 /* RecordingsView.swift in Sources */,
 				4553FA3424E0A443004A53FB /* Recording.swift in Sources */,
 				4543B4B524C4EDA600081BB5 /* Colors.swift in Sources */,
 				4543B4A124C4E5AF00081BB5 /* AppDelegate.swift in Sources */,
 				4543B4A324C4E5AF00081BB5 /* SceneDelegate.swift in Sources */,
+				4553FA3F24EC56EB004A53FB /* UserInfo.swift in Sources */,
 				4543B4C324C90D9E00081BB5 /* RecordingsViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

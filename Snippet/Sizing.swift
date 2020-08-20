@@ -16,5 +16,6 @@ struct Sizing {
     }
     struct Tracks {
         static let SNIPPET_TO_TRACK_SPACING: CGFloat = 8
+        static let TRACK_WIDTH: CGFloat = 80
     }
 }

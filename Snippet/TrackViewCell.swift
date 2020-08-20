@@ -12,6 +12,7 @@ import SnapKit
 class TrackViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     var draggableSnippets: [UIView] = []
     var zoomMultiplier: Double!
+    var startPanLocation: CGPoint?
     weak var delegate: TrackViewCellDelegate?
     
     override func prepareForReuse() {
@@ -56,8 +57,23 @@ class TrackViewCell: UICollectionViewCell, UIGestureRecognizerDelegate {
     
     
     @objc func wasDragged(gestureRecognizer: UIPanGestureRecognizer) {
+        if gestureRecognizer.state == .began {
+            startPanLocation = gestureRecognizer.location(in: self.contentView)
+        }
         if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
             let translation = gestureRecognizer.translation(in: self.contentView)
+            let xTranslation = gestureRecognizer.location(in: self.contentView).x - (startPanLocation?.x ?? 0)
+            if xTranslation > Sizing.Tracks.TRACK_WIDTH + Sizing.Tracks.SNIPPET_TO_TRACK_SPACING {
+                print("right")
+                if (delegate?.changeTrack(snippetId: gestureRecognizer.view!.tag, left: false))! { // Boolean represents success
+                    draggableSnippets = draggableSnippets.filter { $0 == gestureRecognizer.view! }
+                }
+            } else if xTranslation < -(Sizing.Tracks.TRACK_WIDTH + Sizing.Tracks.SNIPPET_TO_TRACK_SPACING) {
+                print("left")
+                if (delegate?.changeTrack(snippetId: gestureRecognizer.view!.tag, left: true))! { // Boolean represents success
+                    draggableSnippets = draggableSnippets.filter { $0 == gestureRecognizer.view! }
+                }
+            }
             if gestureRecognizer.view!.frame.minY < 0 || gestureRecognizer.view!.frame.minY == 0 && translation.y <= 0 {
                 gestureRecognizer.view!.frame = CGRect(x: gestureRecognizer.view!.frame.minX,
                                                        y: 0,

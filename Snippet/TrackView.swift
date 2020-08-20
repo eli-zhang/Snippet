@@ -13,6 +13,7 @@ class TrackView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, U
     
     var collectionView: UICollectionView!
     var reuseIdentifier = "trackViewReuseIdentifier"
+    var addTrackReuseIdentifier = "addTrackReuseIdentifier"
     var tracks: [[Snippet]] = []
     var startTimes: [(Double, Snippet)] = []
     var zoomMultiplier: Double = 0.003  // Every millisecond is zoomMultiplier * location
@@ -28,13 +29,17 @@ class TrackView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, U
         
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
+        layout.minimumLineSpacing = 0
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(TrackViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        collectionView.register(AddTrackCell.self, forCellWithReuseIdentifier: addTrackReuseIdentifier)
         collectionView.backgroundColor = Colors.RED
         collectionView.layer.cornerRadius = 8
         collectionView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
+        collectionView.alwaysBounceVertical = true
+        collectionView.alwaysBounceHorizontal = true
         addSubview(collectionView)
         
         setupConstraints()
@@ -74,28 +79,38 @@ class TrackView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, U
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfSections section: Int) -> Int {
-        return tracks.count
+        return tracks.count + 1 // Extra track for adding tracks
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if tracks.count == 0 {
-            return 0
-        }
         return 1    // One cell per track
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! TrackViewCell
-        for snippet in tracks[indexPath.section] {
-            cell.createDraggableSnippet(snippet: snippet, zoomMultiplier: zoomMultiplier)
+        print("PATH: \(indexPath.section)")
+        print(tracks.count)
+        print(collectionView.numberOfSections)
+        if indexPath.section == tracks.count {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: addTrackReuseIdentifier, for: indexPath) as! AddTrackCell
+            cell.delegate = self
+            cell.setNeedsUpdateConstraints()
+            cell.backgroundColor = .purple
+            return cell
         }
-        cell.delegate = self
-        cell.setNeedsUpdateConstraints()
-        return cell
+        else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! TrackViewCell
+            for snippet in tracks[indexPath.section] {
+                cell.createDraggableSnippet(snippet: snippet, zoomMultiplier: zoomMultiplier)
+            }
+            cell.delegate = self
+            cell.setNeedsUpdateConstraints()
+            cell.backgroundColor = .yellow
+            return cell
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: self.frame.size.width / 4, height: collectionView.frame.height)
+        return CGSize(width: Sizing.Tracks.TRACK_WIDTH, height: collectionView.frame.height)
     }
 }
 
@@ -127,8 +142,30 @@ extension TrackView: TrackViewCellDelegate {
         collectionView.reloadData()
     }
     
-    func changeTrack(snippetId: Int) -> Bool {
-        return true
+    func changeTrack(snippetId: Int, left: Bool) -> Bool {
+        for (trackIndex, track) in tracks.enumerated() {
+            for snippet in track {
+                if snippet.id == snippetId {
+                    if left && trackIndex > 0 {
+                        print("lefto")
+                        let updatedSnippet = Snippet(id: snippet.id, startTime: snippet.startTime, endTime: snippet.endTime, recordingStartTime: snippet.recordingStartTime, recordingEndTime: snippet.recordingEndTime, duration: snippet.duration, recording: snippet.recording, track: trackIndex - 1)
+                        tracks[trackIndex] = track.filter { $0.id != snippetId }
+                        tracks[trackIndex - 1].append(updatedSnippet)
+                        collectionView.reloadData()
+                        return true
+                    } else if !left && trackIndex < tracks.count - 1 {
+                        print("righto")
+                        let updatedSnippet = Snippet(id: snippet.id, startTime: snippet.startTime, endTime: snippet.endTime, recordingStartTime: snippet.recordingStartTime, recordingEndTime: snippet.recordingEndTime, duration: snippet.duration, recording: snippet.recording, track: trackIndex + 1)
+                        tracks[trackIndex] = track.filter { $0.id != snippetId }
+                        tracks[trackIndex + 1].append(updatedSnippet)
+                        collectionView.reloadData()
+                        return true
+                    }
+                    return false
+                }
+            }
+        }
+        return false
     }
     
     func translate(snippetId id: Int, newStartTime: Double, newEndTime: Double) {
@@ -150,9 +187,20 @@ extension TrackView: TrackViewCellDelegate {
             }
         }
     }
+    
+    func addEmptyTrack() {
+        print("BEFORE: \(collectionView.numberOfSections)")
+        self.tracks.append([])
+        print("AFTER: \(collectionView.numberOfSections)")
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+            print("AFTERAFTER: \(self.collectionView.numberOfSections)")
+        }
+    }
 }
 
 protocol TrackViewCellDelegate: class {
-    func changeTrack(snippetId: Int) -> Bool
+    func changeTrack(snippetId: Int, left: Bool) -> Bool
     func translate(snippetId: Int, newStartTime: Double, newEndTime: Double)
+    func addEmptyTrack()
 }

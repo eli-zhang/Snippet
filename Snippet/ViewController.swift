@@ -82,6 +82,19 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AudioPlayerDele
         setupConstraints()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Sockets.connect(completion: {
+            print("Connected! YEEE")
+        })
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        Sockets.disconnect(completion: {
+            print("Disconnected.")
+        })
+    }
+    
     func setupConstraints() {
         zoomSlider.snp.makeConstraints({ make -> Void in
             make.leading.trailing.equalTo(coreButtons)
@@ -116,21 +129,28 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AudioPlayerDele
         })
     }
     
+    @objc func checkPermissions() -> Bool {
+        switch AVAudioSession.sharedInstance().recordPermission {
+        case .granted:
+            return true
+        case .denied:
+            return false
+        case .undetermined:
+            return false
+        @unknown default:
+            return false
+        }
+    }
+    
     @objc func askForPermissions() {
-        do {
-            try recordingSession.setCategory(.playAndRecord, mode: .default)
-            try recordingSession.setActive(true)
-            recordingSession.requestRecordPermission() { [unowned self] allowed in
-                DispatchQueue.main.async {
-                    if allowed {
-                        print("Permission granted!")
-                    } else {
-                        print("User did not grant permission.")
-                    }
+        recordingSession.requestRecordPermission() { [unowned self] allowed in
+            DispatchQueue.main.async {
+                if allowed {
+                    print("Permission granted!")
+                } else {
+                    print("User did not grant permission.")
                 }
             }
-        } catch {
-            print("Failed to request recording session")
         }
     }
     
@@ -204,10 +224,30 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AudioPlayerDele
     }
     
     @objc func beginPlayback() {
+        do {
+            try recordingSession.setCategory(.playAndRecord, mode: .default)
+            try recordingSession.setActive(true)
+        }
+        catch {
+            print("Failed to start AVAudioSession; most likely already started")
+        }
         self.trackView.beginPlayback()
     }
     
     @objc func recordTapped() {
+        let permissionGranted = checkPermissions()
+        if !permissionGranted {
+            askForPermissions()
+        }
+        
+        do {
+            try recordingSession.setCategory(.playAndRecord, mode: .default)
+            try recordingSession.setActive(true)
+        }
+        catch {
+            print("Failed to start AVAudioSession; most likely already started")
+        }
+        
         if audioRecorder == nil {
             startRecording()
         } else {
