@@ -156,6 +156,7 @@ class ViewController: UIViewController, AVAudioRecorderDelegate, AudioPlayerDele
     
     func setVolume() {
         do {
+            try AVAudioSession.sharedInstance().setCategory(.playAndRecord, options: [.mixWithOthers, .allowBluetooth, .defaultToSpeaker])
             try AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
         } catch {
             print("Couldn't set audio to play from main speaker.")

@@ -30,6 +30,8 @@ class TrackView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, U
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
+        layout.scrollDirection = .horizontal
+        
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -38,7 +40,6 @@ class TrackView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, U
         collectionView.backgroundColor = Colors.RED
         collectionView.layer.cornerRadius = 8
         collectionView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
-        collectionView.alwaysBounceVertical = true
         collectionView.alwaysBounceHorizontal = true
         addSubview(collectionView)
         
@@ -79,32 +80,27 @@ class TrackView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, U
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfSections section: Int) -> Int {
-        return tracks.count + 1 // Extra track for adding tracks
+        return 1    // Extra track for adding tracks
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1    // One cell per track
+        return tracks.count + 1    // One cell per track
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        print("PATH: \(indexPath.section)")
-        print(tracks.count)
-        print(collectionView.numberOfSections)
-        if indexPath.section == tracks.count {
+        if indexPath.item == tracks.count {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: addTrackReuseIdentifier, for: indexPath) as! AddTrackCell
             cell.delegate = self
             cell.setNeedsUpdateConstraints()
-            cell.backgroundColor = .purple
             return cell
         }
         else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! TrackViewCell
-            for snippet in tracks[indexPath.section] {
+            for snippet in tracks[indexPath.item] {
                 cell.createDraggableSnippet(snippet: snippet, zoomMultiplier: zoomMultiplier)
             }
             cell.delegate = self
             cell.setNeedsUpdateConstraints()
-            cell.backgroundColor = .yellow
             return cell
         }
     }
@@ -112,23 +108,30 @@ class TrackView: UIView, UICollectionViewDataSource, UICollectionViewDelegate, U
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: Sizing.Tracks.TRACK_WIDTH, height: collectionView.frame.height)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
 }
 
 extension TrackView: TrackViewCellDelegate {
     func addRecordingToTrack(recording: Recording) {
         let newSnippet = Snippet(id: GenerateId.generateSnippetId(), startTime: 0, endTime: recording.duration, recordingStartTime: 0, recordingEndTime: recording.duration, duration: recording.duration, recording: recording, track: 0)
+        startTimes.append((newSnippet.startTime, newSnippet))
+        startTimes.sort(by: snippetTimeSorter)
         if tracks.count == 0 {
             tracks.append([newSnippet])
-            startTimes.append((newSnippet.startTime, newSnippet))
-            startTimes.sort(by: snippetTimeSorter)
-            
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
             }
         } else {
-            tracks[tracks.count - 1].append(newSnippet)
+            tracks[0].append(newSnippet)
             DispatchQueue.main.async {
-                self.collectionView.reloadSections([self.tracks.count - 1])
+                self.collectionView.reloadData()
             }
         }
     }
@@ -189,12 +192,9 @@ extension TrackView: TrackViewCellDelegate {
     }
     
     func addEmptyTrack() {
-        print("BEFORE: \(collectionView.numberOfSections)")
         self.tracks.append([])
-        print("AFTER: \(collectionView.numberOfSections)")
         DispatchQueue.main.async {
             self.collectionView.reloadData()
-            print("AFTERAFTER: \(self.collectionView.numberOfSections)")
         }
     }
 }
